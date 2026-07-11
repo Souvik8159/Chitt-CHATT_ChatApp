@@ -31,15 +31,25 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
-  catch (error) {
-  console.error("Signup Error:", error);
-  console.log("Response:", error.response);
+  signup: async (data) => {
+  set({ isSigningUp: true });
+  try {
+    const res = await axiosInstance.post("/auth/signup", data);
+    set({ authUser: res.data });
+    toast.success("Account created successfully");
+    get().connectSocket();
+  } catch (error) {
+    console.error("Signup Error:", error);
+    console.log("Response:", error.response);
 
-  toast.error(
-    error.response?.data?.message ||
-    error.message ||
-    "Server connection failed"
-  );
+    toast.error(
+      error.response?.data?.message ||
+      error.message ||
+      "Server connection failed"
+    );
+  } finally {
+    set({ isSigningUp: false });
+  }
 },
 
   login: async (data) => {
